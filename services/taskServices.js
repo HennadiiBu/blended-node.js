@@ -8,6 +8,9 @@ const readDB = async () => {
   const result = await fs.readFile(taskPath);
   return JSON.parse(result);
 };
+const writeDB = async (data) => {
+  await fs.writeFile(taskPath, JSON.stringify(data, null, 4));
+};
 
 const getAllTasksService = async () => {
   return await readDB();
@@ -34,9 +37,27 @@ const createTaskService = async ({ title, completed }) => {
   return newTask;
 };
 
-const updateTaskService = () => {};
+const updateTaskService = async (id, body) => {
+  const tasks = await readDB();
+  const taskIndex = tasks.findIndex((task) => task.id === id);
+  if (taskIndex === -1) {
+    throw new Error("Task not found");
+  }
+  tasks.splice(taskIndex, 1, { ...tasks[taskIndex], ...body });
+  await writeDB(tasks);
+  return tasks[taskIndex];
+};
 
-const deleteTaskService = () => {};
+const deleteTaskService = async (id) => {
+  const tasks = await readDB();
+  const taskIndex = tasks.findIndex((task) => task.id === id);
+  if (taskIndex === -1) {
+    throw new Error("Task not found");
+  }
+  const [deletedTask] = tasks.splice(taskIndex, 1);
+  await writeDB(tasks);
+  return deletedTask;
+};
 
 module.exports = {
   getAllTasksService,
