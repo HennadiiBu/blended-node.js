@@ -31,9 +31,25 @@ const createTask = async (req, res, next) => {
   }
 };
 
-const updateTask = (req, res, next) => {};
+const updateTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updatedTask = await updateTaskService(id, req.body);
+    res.status(200).json(updatedTask);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
 
-const deleteTask = (req, res, next) => {};
+const deleteTask = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const removedTask = await deleteTaskService(id);
+    res.status(200).json(removedTask);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
 
 module.exports = {
   getAllTasks,
