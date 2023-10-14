@@ -6,50 +6,36 @@ const {
   deleteTaskService,
 } = require("../services/taskServices");
 
-const getAllTasks = async (req, res, next) => {
+const controllerWrapper = require("../utils/controllerWrapper");
+
+const getAllTasks = controllerWrapper(async (req, res, next) => {
   const tasks = await getAllTasksService();
   res.json(tasks);
-};
+});
 
-const getOneTask = async (req, res, next) => {
+const getOneTask = controllerWrapper(async (req, res, next) => {
   const { id } = req.params;
 
-  try {
-    const task = await getOneTaskService(id);
-    res.json(task);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+  const task = await getOneTaskService(id);
+  res.json(task);
+});
 
-const createTask = async (req, res, next) => {
-  try {
-    const newTask = await createTaskService(req.body);
-    res.status(201).json(newTask);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+const createTask = controllerWrapper(async (req, res, next) => {
+  const newTask = await createTaskService(req.body);
+  res.status(201).json(newTask);
+});
 
-const updateTask = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const updatedTask = await updateTaskService(id, req.body);
-    res.status(200).json(updatedTask);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+const updateTask = controllerWrapper(async (req, res, next) => {
+  const { id } = req.params;
+  const updatedTask = await updateTaskService(id, req.body);
+  res.status(200).json(updatedTask);
+});
 
-const deleteTask = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const removedTask = await deleteTaskService(id);
-    res.status(200).json(removedTask);
-  } catch (error) {
-    res.status(404).json({ message: error.message });
-  }
-};
+const deleteTask = controllerWrapper(async (req, res, next) => {
+  const { id } = req.params;
+  const removedTask = await deleteTaskService(id);
+  res.status(200).json(removedTask);
+});
 
 module.exports = {
   getAllTasks,

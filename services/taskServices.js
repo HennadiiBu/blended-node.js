@@ -1,62 +1,41 @@
-const fs = require("fs/promises");
-const path = require("path");
-const crypto = require("crypto");
+const HttpError = require("../utils/HttpError");
 
-const taskPath = path.join(__dirname, "..", "db", "tasks.json");
-
-const readDB = async () => {
-  const result = await fs.readFile(taskPath);
-  return JSON.parse(result);
-};
-const writeDB = async (data) => {
-  await fs.writeFile(taskPath, JSON.stringify(data, null, 4));
-};
+const Task = require("../models/Task");
 
 const getAllTasksService = async () => {
-  return await readDB();
+  return await Task.find();
 };
 
 const getOneTaskService = async (id) => {
-  const tasks = await readDB();
-  const task = tasks.find((task) => task.id === id);
+  const task = await Task.findById(id);
+
   if (!task) {
-    throw new Error("Task not found");
+    throw new HttpError(404);
   }
   return task;
 };
 
-const createTaskService = async ({ title, completed }) => {
-  const newTask = {
-    id: crypto.randomUUID(),
-    title,
-    completed,
-  };
-  const tasks = await readDB();
-  tasks.push(newTask);
-  await fs.writeFile(taskPath, JSON.stringify(tasks, null, 4));
-  return newTask;
+const createTaskService = async (body) => {
+  return await Task.create(body);
 };
 
 const updateTaskService = async (id, body) => {
-  const tasks = await readDB();
-  const taskIndex = tasks.findIndex((task) => task.id === id);
-  if (taskIndex === -1) {
-    throw new Error("Task not found");
+  const task = await Task.findByIdAndUpdate(id, body, { new: true });
+
+  if (!task) {
+    throw new HttpError(404);
   }
-  tasks.splice(taskIndex, 1, { ...tasks[taskIndex], ...body });
-  await writeDB(tasks);
-  return tasks[taskIndex];
+  return task;
 };
 
 const deleteTaskService = async (id) => {
-  const tasks = await readDB();
-  const taskIndex = tasks.findIndex((task) => task.id === id);
-  if (taskIndex === -1) {
-    throw new Error("Task not found");
+  const task = await Task.findByIdAndDelete(id);
+
+  if (!task) {
+    throw new HttpError(404);
   }
-  const [deletedTask] = tasks.splice(taskIndex, 1);
-  await writeDB(tasks);
-  return deletedTask;
+
+  return task;
 };
 
 module.exports = {
