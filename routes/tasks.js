@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../middlewares/auth");
 const {
   getAllTasks,
   getOneTask,
@@ -15,6 +16,8 @@ const {
 const validateBody = require("../utils/validation/validateBody");
 
 const router = express.Router();
+
+router.use(auth);
 
 router.get("/", getAllTasks);
 
