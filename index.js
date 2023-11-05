@@ -9,6 +9,6 @@ const { PORT, DB_URI } = process.env;
   await mongoose.connect(DB_URI);
   console.log(`Connection to database successfully`);
   app.listen(PORT, () => {
-    console.log(`Server run at ${PORT} port`);
+    console.log(`Server run at ${PORT} port!!!`);
   });
 })();
