@@ -6,6 +6,8 @@ const {
   signOut,
 } = require("../controlers/authControllers")
 
+const auth = require("../middlewares/auth")
+
 const router = express.Router();
 
 
@@ -13,6 +15,7 @@ router.post("/signup", signUp);
 
 router.post("/signin", signIn);
 
-router.post("/signout", signOut);
+
+router.post("/signout", auth, signOut);
 
 module.exports = {authRouter: router};

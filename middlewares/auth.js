@@ -1,21 +1,21 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const {assignTokens} = require("../utils/validation/assignTokens");
-const {HttpError} = require("../utils/HttpError");
+const HttpError = require("../utils/HttpError");
 const {JWT_ACCESS_SECRET, JWT_REFRESH_SECRET} = process.env;
 
 const auth = async(req, res, next) =>{
   const { authorization = '' } = req.headers;
   const [bearer, token] = authorization.split(' ');
   if (bearer !== 'Bearer' || !token) {
-    return next(new HttpError(401));
+    return next(new HttpError(401, `no token`));
   }
   let fetchedUser;
   try {
     const decoded = jwt.decode(token);
     fetchedUser = await User.findById(decoded.id);
-    if (!fetchedUser || !fetchedUser.refresh_token) {
-      return next(new HttpError(401));
+    if (!fetchedUser || !fetchedUser.refreshToken) {
+      return next(new HttpError(401, `user not found`));
     }
     jwt.verify(token, JWT_ACCESS_SECRET);
     req.user = fetchedUser;
